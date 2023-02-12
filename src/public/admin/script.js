@@ -41,8 +41,23 @@ document.querySelector('#ok').addEventListener('click', () => {
     for (let i = 3; i <= 17; i++) {
         promises.push(processFile(i));
     }
+    function processGoogleDriveURL(url) {
+        if(url.indexOf('https') > -1) {
+            url = url.substring(url.indexOf('/d/')+3, url.lastIndexOf('/'))
+        }
+        return `https://drive.google.com/uc?export=download&id=` + url
+    }
     Promise.all(promises)
         .then(() => {
+            for(let i = 1; i <= 14; i++) {
+                if(!data[`img${i}`]) {
+                    data[`img${i}`] = processGoogleDriveURL(data[`img${i}-1`])
+                }
+            }
+            if(!data['music']) {
+                data['music'] = processGoogleDriveURL(data['music-1'])
+            }
+
             console.log('complete', roughSizeOfObject(data))
             alert('complete' + roughSizeOfObject(data))
             socket.emit('admin-data', data)
